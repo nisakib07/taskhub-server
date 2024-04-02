@@ -79,4 +79,14 @@ app.get("/pendingTasks", verifyToken, async (req, res) => {
   }
 });
 
+app.delete("/deleteTask/:id", verifyToken, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const result = await Tasks.deleteOne({ _id: id });
+    res.send(result);
+  } catch (error) {
+    res.send(error.message);
+  }
+});
+
 export default allRoutes;
