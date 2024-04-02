@@ -79,6 +79,70 @@ app.get("/pendingTasks", verifyToken, async (req, res) => {
   }
 });
 
+app.get("/ongoing-num", async (req, res) => {
+  try {
+    const userEmail = req.query.email;
+    const result = await Tasks.find({
+      email: userEmail,
+      status: "ongoing",
+    }).countDocuments();
+    console.log(result);
+    res.send({ total: result });
+  } catch (error) {
+    res.send("Something wrong");
+  }
+});
+
+app.get("/ongoingTasks", verifyToken, async (req, res) => {
+  try {
+    const skipFrom = req.query.skip;
+    const userEmail = req.query.email;
+    const result = await Tasks.find({
+      email: userEmail,
+      status: "ongoing",
+    })
+      .sort({ createdAt: -1 })
+      .skip(skipFrom)
+      .limit(4);
+
+    res.send(result);
+  } catch (error) {
+    res.status(500).send("Something went wrong.");
+  }
+});
+
+app.get("/completed-num", async (req, res) => {
+  try {
+    const userEmail = req.query.email;
+    const result = await Tasks.find({
+      email: userEmail,
+      status: "completed",
+    }).countDocuments();
+    console.log(result);
+    res.send({ total: result });
+  } catch (error) {
+    res.send("Something wrong");
+  }
+});
+
+app.get("/completedTasks", verifyToken, async (req, res) => {
+  try {
+    const skipFrom = req.query.skip;
+    const userEmail = req.query.email;
+    const result = await Tasks.find({
+      email: userEmail,
+      status: "completed",
+    })
+      .sort({ createdAt: -1 })
+      .skip(skipFrom)
+      .limit(4);
+
+    res.send(result);
+  } catch (error) {
+    res.status(500).send("Something went wrong.");
+  }
+});
+
 app.get("/singleTask/:id", verifyToken, async (req, res) => {
   try {
     const id = req.params.id;
@@ -107,6 +171,23 @@ app.put("/editTask/:id", async (req, res) => {
     const result = await Tasks.updateOne(
       { _id: id },
       { $set: updatedTask },
+      { upsert: true }
+    );
+
+    res.send(result);
+  } catch (error) {
+    res.send(error.message);
+  }
+});
+
+app.put("/updateStatus/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const updatedStatus = req.body;
+
+    const result = await Tasks.updateOne(
+      { _id: id },
+      { $set: updatedStatus },
       { upsert: true }
     );
 
