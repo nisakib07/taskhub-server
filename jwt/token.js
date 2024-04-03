@@ -1,7 +1,7 @@
 import Jwt from "jsonwebtoken";
 import app from "../app.js";
 
-const CreateToken = async () => {
+const CreateToken = () => {
   app.post("/jwt", async (req, res) => {
     const user = req.body;
     const token = Jwt.sign(user, process.env.SECRET_TOKEN, {
